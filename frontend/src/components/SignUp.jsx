@@ -5,18 +5,40 @@ const SignUp = () => {
     const [userEmail,setUserEmail] = useState('');
     const [userPassword,setUserPassword] = useState('');
     const [error,setError] = useState('');
-
-    const handleSignUp=()=>{
-        setError('');
-        if(!userName && !userEmail && !userPassword){
-            setError('Missing fields !');
-            return;
-        }
-        console.log(userEmail+" "+userName+" "+userPassword);
+    const clearAllFields = ()=>{
         setUserName('')
         setUserEmail('')
         setUserPassword('')
     }
+
+    const handleSignUp = async () => {
+        setError('');
+        if (!userName || !userEmail || !userPassword) {
+          setError('Missing fields!');
+          return;
+        }
+      
+        try {
+          const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/signup`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userName, userEmail, userPassword }),
+          });
+      
+          const data = await response.json();
+          if (response.ok) {
+            clearAllFields();
+            setError('Signup successfull')
+          } else {
+            setError(data.message || 'Signup failed');
+          }
+        } catch (error) {
+          console.error('Signup error:', error);
+          setError('An error occurred during signup.');
+        }
+      };
 
   return (
     <div className='flex flex-col items-center'>
